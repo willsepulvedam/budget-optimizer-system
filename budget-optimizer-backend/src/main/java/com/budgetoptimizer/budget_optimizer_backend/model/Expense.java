@@ -30,7 +30,7 @@ public class Expense {
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "budget_id", nullable = false)
+    @JoinColumn(name = "presupuesto_id", nullable = false)
     private Presupuesto presupuesto;
     
     @ManyToOne(fetch = FetchType.LAZY)

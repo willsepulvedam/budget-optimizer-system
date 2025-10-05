@@ -1,14 +1,12 @@
 package com.budgetoptimizer.budget_optimizer_backend.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.budgetoptimizer.budget_optimizer_backend.enums.AccountType;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,14 +17,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cuentas")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cuenta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,20 +54,11 @@ public class Cuenta {
      @CreationTimestamp
      private LocalDateTime fechaCreacion;
 
-     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL, orphanRemoval = true)
-     private List<HistorialBusqueda> historialBusquedas;
-
      // metodos relevantes
 
      // metodo para suscribirse a una categoria
      public void suscribirseACategoria(Categoria categoria) {
           this.preferencias.add(categoria);
-     }
-
-     // metodo para agregar una busqueda al historial
-     public void agregarBusquedaAlHistorial(HistorialBusqueda busqueda) {
-          this.historialBusquedas.add(busqueda);
-          busqueda.setCuenta(this);
      }
 
      // metodo para calcular el presupuesto disponible basado en el saldo y las

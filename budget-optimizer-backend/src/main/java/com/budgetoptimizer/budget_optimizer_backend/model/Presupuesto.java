@@ -64,10 +64,10 @@ public class Presupuesto {
     private LocalDateTime fechaCreacion;
     
     // Relaciones
-    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "presupuesto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryLimit> limitesCategorias;
     
-    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "presupuesto", cascade = CascadeType.ALL)
     private List<Expense> expenses;
     
     // Métodos helper

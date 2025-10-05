@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.budgetoptimizer.budget_optimizer_backend.enums.AccountType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,6 +23,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @Entity
 @Table(name = "usuarios")
@@ -50,6 +52,7 @@ public class Usuario {
     private Double presupuestoMensualBase; // Presupuesto base sin ajustes
     
     @Enumerated(EnumType.STRING)
+    @Column(name = "account_type", nullable = false)
     private AccountType role = AccountType.USER;
     
     @Column(nullable = false)
@@ -60,21 +63,27 @@ public class Usuario {
     
     // ⚠️ AGREGAR: Relaciones con presupuestos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Presupuesto> presupuestos;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Expense> expenses;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<MLOptimization> mlOptimizations;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Review> reviews;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<HistorialBusqueda> historialBusquedas;
     
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Cuenta cuenta;
 
     
@@ -87,4 +96,6 @@ public class Usuario {
     public void establecerUbicacion(Coordenada coordenada) {
         this.ubicacion = coordenada;
     }
+
+    
 }

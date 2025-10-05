@@ -19,11 +19,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 
 @Entity
 @Table(name = "ml_optimizations")
@@ -45,7 +46,7 @@ public class MLOptimization {
     private Presupuesto presupuesto; // Puede ser null si es análisis general
     
     // ⭐⭐⭐ COLUMNA JSONB - Respuesta completa de FastAPI
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     private String mlResponse;
     
@@ -96,6 +97,54 @@ public class MLOptimization {
         
         return empresaIds;
     }
+
+    /**
+     * Extrae el presupuesto optimizado del JSON
+     */
+    public Double getPresupuestoOptimizado() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(mlResponse);
+        
+        if (node.has("optimized_budget")) {
+            return node.get("optimized_budget").asDouble();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Extrae las alertas del JSON
+     */
+    public List<String> getAlertas() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(mlResponse);
+        List<String> alertas = new ArrayList<>();
+        
+        if (node.has("alerts")) {
+            JsonNode alertsNode = node.get("alerts");
+            for (JsonNode alert : alertsNode) {
+                alertas.add(alert.asText());
+            }
+        }
+        
+        return alertas;
+    }
+    
+    /**
+     * Verifica si la optimización tiene alta confianza (>= 0.7)
+     */
+    public Boolean tieneAltaConfianza() {
+        return confidence != null && confidence >= 0.7;
+    }
+    
+    /**
+     * Verifica si ya fue aplicada por el usuario
+     */
+    public Boolean fueAplicada() {
+        return aplicada != null && aplicada;
+    }
 }
+
+
 
 
