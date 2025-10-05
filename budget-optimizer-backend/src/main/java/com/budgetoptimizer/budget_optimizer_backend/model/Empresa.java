@@ -4,39 +4,71 @@ package com.budgetoptimizer.budget_optimizer_backend.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.budgetoptimizer.budget_optimizer_backend.enums.TipoEmpresa;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "empresas")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Empresa {
-
-    @Embedded
-    private Coordenada ubicacion;
-    @Embedded
-    private RangoPrecios rangoPrecios;
+    @Id
     @Column(unique = true, nullable = false, length = 36)
-    private String id; 
+    private String id;
+    
     @Column(nullable = false, length = 200)
     private String nombre;
+    
     @Enumerated(EnumType.STRING)
     private TipoEmpresa tipoEmpresa;
-    @Column(precision = 3, scale = 2) // Ejemplo: 4.75
+    
+    // ⭐ AGREGAR: Relación ManyToMany con categorías
+    @ManyToMany
+    @JoinTable(
+        name = "empresa_categorias",
+        joinColumns = @JoinColumn(name = "empresa_id"),
+        inverseJoinColumns = @JoinColumn(name = "categoria_id")
+    )
+    private List<Categoria> categorias;
+    
+    @Embedded
+    private Coordenada ubicacion;
+    
+    @Embedded
+    private RangoPrecios rangoPrecios;
+    
+    @Column(precision = 3, scale = 2)
     private Double calificacionPromedio;
-    @OneToMany(mappedBy = "empresa", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
+    
+    // ⚠️ AGREGAR: Relación con gastos
+    @OneToMany(mappedBy = "empresa")
+    private List<Expense> expenses;
+    
     @Column(nullable = false)
-    private Boolean activa;
-    @Column(updatable = false, nullable = false)
+    private Boolean activa = true;
+    
+    @CreationTimestamp
     private LocalDateTime fechaCreacion;
 
     // metodos relevantes 

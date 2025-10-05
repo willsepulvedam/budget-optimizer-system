@@ -1,5 +1,5 @@
 // Importar estilos
-import '../assets/css/main.css'
+import './style.css'
 
 // Importar módulos
 import { initRouter } from './utils/router.js'
