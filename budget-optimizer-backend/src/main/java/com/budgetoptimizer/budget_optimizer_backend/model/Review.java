@@ -25,8 +25,7 @@ public class Review {
      
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(length = 36, nullable = false, unique = true)
-    private String id; 
+    private Long id; 
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
@@ -45,7 +44,7 @@ public class Review {
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime fecha; 
-    
+
     @Column(nullable = false)
     private Boolean verificada;
 
