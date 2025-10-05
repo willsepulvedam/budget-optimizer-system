@@ -53,7 +53,7 @@ public class Usuario {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
-    private AccountType role = AccountType.USER;
+    private AccountType accountType = AccountType.USER;
     
     @Column(nullable = false)
     private Boolean activo = true;

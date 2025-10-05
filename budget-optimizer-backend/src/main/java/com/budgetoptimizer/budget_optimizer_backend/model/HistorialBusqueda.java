@@ -24,20 +24,26 @@ import lombok.NoArgsConstructor;
 public class HistorialBusqueda {
 
 
-    private Integer resultadosEncontrados;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cuenta_id", nullable = false)
-    private Cuenta cuenta; 
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario; 
+
     @Column(updatable = false, nullable = false)
     private LocalDateTime fecha;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresaSeleccionada;
+
     @Column(length = 1000)
     private String filtrosUsados;
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-    @JoinColumn(name = "empresa_id")
-    private Empresa empresaSeleccionada; 
+
+    private Integer resultadosEncontrados;
     
     // metodos relevantes 
     public Boolean esReciente(LocalDateTime fechaComparacion) { // verifica si la busqueda es posterior a una fecha dada
