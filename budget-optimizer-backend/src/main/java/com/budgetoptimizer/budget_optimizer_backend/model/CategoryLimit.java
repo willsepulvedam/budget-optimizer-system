@@ -37,7 +37,7 @@ public class CategoryLimit {
     @Column(nullable = false)
     private Double limiteAsignado;
     
-    @Column(precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double gastoActual = 0.0;
     
     @CreationTimestamp
