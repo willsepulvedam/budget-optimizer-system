@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RangoPrecios {
     @Column(nullable = false)
-    private double minimo; 
+    private Double minimo;
     @Column(nullable = false)
-    private double maximo; 
+    private Double maximo;
     @Column(nullable = false)
-    private double promedio;
-    
+    private Double promedio;
+
     // metodo para verificar si un precio es accesible dentro del rango
     public boolean esAccesible(double precio) {
         return precio >= minimo && precio <= maximo;

@@ -3,6 +3,8 @@ package com.budgetoptimizer.budget_optimizer_backend.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,6 +35,7 @@ public class HistorialBusqueda {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario; 
 
+    @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime fecha;
 

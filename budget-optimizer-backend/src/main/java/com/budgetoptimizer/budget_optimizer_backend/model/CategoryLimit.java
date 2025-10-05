@@ -34,7 +34,7 @@ public class CategoryLimit {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
     
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double limiteAsignado;
     
     @Column(precision = 10, scale = 2)

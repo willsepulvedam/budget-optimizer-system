@@ -43,7 +43,7 @@ public class Presupuesto {
     @Column(nullable = false, length = 100)
     private String nombre; // "Presupuesto Octubre 2025"
     
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double montoTotal;
     
     @Column(nullable = false)

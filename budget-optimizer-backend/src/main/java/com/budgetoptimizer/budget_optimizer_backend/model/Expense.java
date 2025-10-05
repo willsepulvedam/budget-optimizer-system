@@ -49,7 +49,7 @@ public class Expense {
     @Column(nullable = false, length = 200)
     private String descripcion;
     
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double monto;
     
     @Column(nullable = false)

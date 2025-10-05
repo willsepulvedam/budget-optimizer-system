@@ -69,7 +69,7 @@ public class MLOptimization {
     }
     */
     
-    @Column(precision = 5, scale = 2)
+    @Column
     private Double confidence; // 0.0 - 1.0
     
     @Enumerated(EnumType.STRING)
