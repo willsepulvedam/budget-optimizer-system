@@ -22,10 +22,10 @@ public class ServicioGeolocalizacion {
 
     private final RestTemplate restTemplate;
 
-    @Value("${geolocalizacion.api.url}")
+    @Value("${app.geolocation.api-url}")
     private String API_URL;
 
-    @Value("${geolocalizacion.api.key}")
+    @Value("${app.geolocation.api-key}")
     private String API_KEY;
 
     public Coordenada obtenerCoordenadas(String ciudad, String pais) {

@@ -1,5 +1,6 @@
 package com.budgetoptimizer.budget_optimizer_backend.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,8 +49,8 @@ public class Usuario {
     @Embedded
     private Coordenada ubicacion;  // Coordenadas geográficas
 
-    @Column(nullable = false)
-    private Double presupuestoMensualBase; // Presupuesto base sin ajustes
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal presupuestoMensualBase; // Presupuesto base sin ajustes
     
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
@@ -88,8 +89,8 @@ public class Usuario {
 
     
     // Método de validar presupuesto
-    public boolean validarPresupuesto(Double monto) {
-        return monto <= this.presupuestoMensualBase;
+    public boolean validarPresupuesto(BigDecimal monto) {
+        return monto.compareTo(this.presupuestoMensualBase) <= 0;
     }
     
     // Método para establecer ubicación

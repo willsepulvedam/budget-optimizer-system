@@ -1,6 +1,7 @@
 package com.budgetoptimizer.budget_optimizer_backend.model;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +59,7 @@ public class Empresa {
     private RangoPrecios rangoPrecios;
     
     @Column(precision = 3, scale = 2)
-    private Double calificacionPromedio;
+    private BigDecimal calificacionPromedio;
     
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
@@ -88,7 +89,7 @@ public class Empresa {
 
     // 2. metodo para verificar si cumple con el presupuesto dado un monto 
     public Boolean cumpleConPresupuesto(Double presupuesto) {
-        return this.rangoPrecios.esAccesible(presupuesto);
+        return this.rangoPrecios.esAccesible(BigDecimal.valueOf(presupuesto));
     }
 
     // 3. metodo para obtener la calicacion promedio actualizada basado en las reviews
@@ -97,11 +98,11 @@ public class Empresa {
             this.calificacionPromedio = null;
             return;
         }
-        double suma = 0.0;
+        BigDecimal suma = BigDecimal.ZERO;
         for (Review review : reviews) {
-            suma += review.getCalificacion();
+            suma = suma.add(BigDecimal.valueOf(review.getCalificacion()));
         }
-        this.calificacionPromedio = suma / reviews.size();
+        this.calificacionPromedio = suma.divide(BigDecimal.valueOf(reviews.size()), 2, java.math.RoundingMode.HALF_UP);
     }
 
 

@@ -1,5 +1,6 @@
 package com.budgetoptimizer.budget_optimizer_backend.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,8 @@ public class MLOptimization {
     }
     */
     
-    @Column
-    private Double confidence; // 0.0 - 1.0
+    @Column(precision = 3, scale = 2)
+    private BigDecimal confidence; // 0.0 - 1.0
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -101,12 +102,12 @@ public class MLOptimization {
     /**
      * Extrae el presupuesto optimizado del JSON
      */
-    public Double getPresupuestoOptimizado() throws JsonProcessingException {
+    public BigDecimal getPresupuestoOptimizado() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(mlResponse);
         
         if (node.has("optimized_budget")) {
-            return node.get("optimized_budget").asDouble();
+            return BigDecimal.valueOf(node.get("optimized_budget").asDouble());
         }
         
         return null;
@@ -134,7 +135,7 @@ public class MLOptimization {
      * Verifica si la optimización tiene alta confianza (>= 0.7)
      */
     public Boolean tieneAltaConfianza() {
-        return confidence != null && confidence >= 0.7;
+        return confidence != null && confidence.compareTo(BigDecimal.valueOf(0.7)) >= 0;
     }
     
     /**
