@@ -2,10 +2,10 @@ from flask import Flask, jsonify, request
 import google.generativeai as genai
 from dotenv import load_dotenv
 import redis
-from config import Config
+from configuracion import Config
 import logging
 import json
-from config import Config
+
 
 # Cargamos el archivo env
 load_dotenv()
@@ -64,6 +64,8 @@ def analizar():
         
         cache_key = f"analisis:{nombre}:{hash(prompt)}"
         
+        # The line `if redis_client and redis_client.exists(cache_key):` is checking if the
+        # `redis_client` object exists and if the key `cache_key` exists in the Redis database.
         if redis_client and redis_client.exists(cache_key):
             logger.info(f"Usando datos de cache para {nombre}")
             cached_data = redis_client.get(cache_key)
