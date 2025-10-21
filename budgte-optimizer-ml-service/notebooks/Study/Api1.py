@@ -3,15 +3,11 @@ from mongoengine import connect ,Document, StringField, IntField, FloatField,Boo
 from mongoengine.errors import NotRegistered, ValidationError, DoesNotExist
 import google.generativeai as gem 
 
-# coniguracion gemini api 
 gem.configure(api_key='api-tuya') # type: ignore
 model = gem.GenerativeModel('gemini-pro') # type: ignore
 
-
-# creamos la aplicacion 
 app = Flask(__name__)
 
-# defino una clase usuario 
 connect('study_model', host='mongodb://localhost:27017/study_model')
 
 class Usuarios(Document): 
@@ -24,9 +20,6 @@ class Usuarios(Document):
     
     meta = {'collection': 'usuarios'}
 
-
-    
-# base de la api con esto podemos visualizar un simple mensaje que luego sera una pagina web 
 @app.route('/')
 def index(): 
     return jsonify('Bienvenido a la api de prueba caremonda')
@@ -109,7 +102,6 @@ def formulario():
     </html>
     '''
     
-# analisis 
 @app.route('/analisis')
 def analisi(): 
     return '''
@@ -358,7 +350,6 @@ def analisi():
     </div>
 
     <script>
-        // Cargar usuarios al iniciar
         window.onload = () => {
             cargarUsuarios();
         };
@@ -392,6 +383,10 @@ def analisi():
         function crearCardUsuario(usuario) {
             const card = document.createElement('div');
             card.className = 'usuario-card';
+            
+            const nombreEscapado = usuario.nombre.replace(/'/g, "\\\\'").replace(/"/g, '\\\\"');
+            const descripcionEscapada = usuario.descripcion.replace(/'/g, "\\\\'").replace(/"/g, '\\\\"');
+            
             card.innerHTML = `
                 <div class="usuario-header">
                     <div class="usuario-nombre">${usuario.nombre}</div>
@@ -417,7 +412,7 @@ def analisi():
                     </div>
                 </div>
                 
-                <button class="btn-analizar" onclick="analizarUsuario('${usuario._id}', '${usuario.nombre.replace(/'/g, "\\'")}', '${usuario.descripcion.replace(/'/g, "\\'")}', ${usuario.edad}, ${usuario.saldo}, ${usuario.activo})">
+                <button class="btn-analizar" data-id="${usuario._id}" data-nombre="${nombreEscapado}" data-descripcion="${descripcionEscapada}" data-edad="${usuario.edad}" data-saldo="${usuario.saldo}" data-activo="${usuario.activo}">
                     🤖 Analizar con IA
                 </button>
                 
@@ -426,11 +421,22 @@ def analisi():
                     <div class="analisis-texto" id="texto-${usuario._id}"></div>
                 </div>
             `;
+            
+            card.querySelector('.btn-analizar').addEventListener('click', function() {
+                analizarUsuario(this);
+            });
+            
             return card;
         }
         
-        async function analizarUsuario(id, nombre, descripcion, edad, saldo, activo) {
-            const btn = event.target;
+        async function analizarUsuario(btn) {
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            const descripcion = btn.dataset.descripcion;
+            const edad = parseInt(btn.dataset.edad);
+            const saldo = parseFloat(btn.dataset.saldo);
+            const activo = btn.dataset.activo === 'true';
+            
             const analisisDiv = document.getElementById('analisis-' + id);
             const textoDiv = document.getElementById('texto-' + id);
             
@@ -483,17 +489,14 @@ def analisi():
             contentDiv.textContent = 'Analizando todos los usuarios...';
             
             try {
-                // Primero obtenemos todos los usuarios
                 const responseUsuarios = await fetch('/usuarios');
                 const usuarios = await responseUsuarios.json();
                 
-                // Creamos un resumen de todos los usuarios
                 let resumenUsuarios = 'Análisis general de ' + usuarios.length + ' usuarios:\\n\\n';
                 usuarios.forEach((u, index) => {
                     resumenUsuarios += `${index + 1}. ${u.nombre} - ${u.descripcion} (Saldo: $${u.saldo}, Edad: ${u.edad})\\n`;
                 });
                 
-                // Enviamos el análisis general a la IA
                 const response = await fetch('/usuarios/ia/analizar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -526,11 +529,12 @@ def analisi():
 </body>
 </html>
 '''
-# ruta del analisis IA
+
 @app.route('/usuarios/ia/analizar', methods=['POST'])
 def analizar_descripcion():
     try:
         data = request.get_json()
+        print(f"Datos recibidos: {data}")
         
         if not data:
             return jsonify({'error': 'No se recibieron datos'}), 400
@@ -544,7 +548,9 @@ def analizar_descripcion():
         
         prompt = f'Eres un analista y recomendador de mejores sitios para hacer compras y adquirir servicios. La persona {nombre} quiere {descripcion} pero tiene un presupuesto de ${saldo}. Recomiéndale los mejores sitios para realizar su inversión en la ciudad de Cartagena.'
         
+        print(f"Enviando prompt a Gemini...")
         response = model.generate_content(prompt)
+        print(f"Respuesta recibida de Gemini")
         
         return jsonify({
             'analisis': response.text.strip(),
@@ -553,44 +559,36 @@ def analizar_descripcion():
         
     except Exception as e:
         print(f"Error en análisis IA: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-
-# ruta en la cual se recibe y guarda la informacion 
 @app.route('/usuarios', methods=['POST'])
 def crear_usuario(): 
     try: 
-        
-        # obtenmos los datos json del formulario 
         data = request.get_json()
         
-        # creamos nuevo usuario
         nuevo_usuario = Usuarios(
             nombre = data.get('nombre'),
             descripcion = data.get('descripcion'),
             edad = data.get('edad'),
             saldo = data.get('saldo', 0.0),
-            telenfono = data.get('telefono'),
+            telenfono = data.get('telenfono'),
             activo = data.get('activo',True)
         )
         
-        # guardamos en mongodb 
         nuevo_usuario.save()
         
-        # respondemos con un json de respuesta que todo ok 
-        return jsonify(
-            {
-                'mensaje': f'Usuario {nuevo_usuario.nombre} guardado extosamente', 
-                'id': str(nuevo_usuario.pk)
-            }, 201
-        )
+        return jsonify({
+            'mensaje': f'Usuario {nuevo_usuario.nombre} guardado exitosamente', 
+            'id': str(nuevo_usuario.pk)
+        }), 201
         
     except ValidationError as e: 
-        return jsonify({'Error': f'Error de validacion: {str(e)}'}), 400
+        return jsonify({'error': f'Error de validacion: {str(e)}'}), 400
     except Exception as e: 
-        return jsonify({'Error': str(e)}), 500
+        return jsonify({'error': str(e)}), 500
     
-# metodo para obtener todos los usuarios 
 @app.route('/usuarios', methods=['GET'])
 def get_all_usuarios():
     try:
@@ -604,7 +602,6 @@ def get_all_usuarios():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-# metodo para obtener usuarios por id 
 @app.route('/usuarios/<string:usuario_id>', methods=['GET'])
 def get_usuario(usuario_id: str):
     try:
@@ -618,7 +615,5 @@ def get_usuario(usuario_id: str):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-    
 if __name__ == '__main__': 
     app.run(debug=True)
-        
