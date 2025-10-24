@@ -1,17 +1,131 @@
 <!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/assets/css/main.css" rel="stylesheet">
-    <title>Budget Optimizer</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link crossorigin href="https://fonts.gstatic.com/" rel="preconnect" />
+  <link as="style"
+    href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    onload="this.rel='stylesheet'" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="estilo.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1173d4",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            display: ["Manrope"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+
+  <title>BudgetWise Dashboard</title>
+  <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+  <div class="flex min-h-screen w-full flex-col">
+
+    
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 px-10 py-3">
+      <div class="flex items-center gap-4">
+        <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor"
+            d="M47.24 24L24 47.24 0.76 24 24 0.76 47.24 24ZM12.24 21h23.52L24 9.24 12.24 21Z" />
+        </svg>
+        <h2 class="text-lg font-bold">BudgetWise</h2>
+      </div>
+      <button class="md:hidden material-symbols-outlined">menu</button>
+    </header>
+
+    
+    <main class="flex flex-1 justify-center p-4 sm:p-6 md:p-10">
+      <div class="w-full max-w-7xl">
+
+        <div class="mb-6">
+          <h1 class="text-3xl font-bold">Dashboard de gestión de Ventas</h1>
+          <p class="text-gray-500 dark:text-gray-400">
+            Análisis de ventas y gestión de clientes según sus preferencias en compras
+          </p>
+        </div>
+
+        <div class="mb-6 flex flex-wrap gap-4">
+          <button class="flex items-center gap-2 rounded bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30">
+            <span>Tiempo de periodo</span>
+            <select id="timePeriod">
+              <option value="today">Hoy</option>
+              <option value="week">Esta semana</option>
+              <option value="month">Este mes</option>
+              <option value="year">Este año</option>
+            </select>
+          </button>
+
+          <button class="flex items-center gap-2 rounded bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30">
+            <span>Categoría</span>
+            <select id="categoria">
+              <option value="sales">Ventas</option>
+              <option value="marketing">Mercadeo</option>
+              <option value="development">Desarrollo</option>
+              <option value="data">Datos</option>
+            </select>
+          </button>
+        </div>
+
+        <div id="result"></div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-6">
+            <h3 class="text-lg font-semibold mb-4">Reporte de Ventas</h3>
+            <div id="chart"></div>
+          </div>
+
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-6">
+            <h3 class="text-lg font-semibold mb-4">Ventas por Mes</h3>
+            <div id="chart1"></div>
+          </div>
+        </div>
+
+
+        <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark">
+          <table class="w-full min-w-[600px] text-left text-sm">
+            <thead class="border-b border-gray-200 dark:border-gray-700">
+              <tr>
+                <th class="px-6 py-3 font-medium">Category</th>
+                <th class="px-6 py-3 font-medium">Budgeted Amount</th>
+                <th class="px-6 py-3 font-medium">Actual Amount</th>
+                <th class="px-6 py-3 font-medium">Variation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="px-6 py-4 font-medium">Housing</td><td>$2,000</td><td>$1,850</td><td class="text-green-600">$150</td></tr>
+              <tr><td class="px-6 py-4 font-medium">Transportation</td><td>$500</td><td>$520</td><td class="text-red-600">-$20</td></tr>
+              <tr><td class="px-6 py-4 font-medium">Food</td><td>$800</td><td>$750</td><td class="text-green-600">$50</td></tr>
+              <tr><td class="px-6 py-4 font-medium">Entertainment</td><td>$300</td><td>$350</td><td class="text-red-600">-$50</td></tr>
+              <tr><td class="px-6 py-4 font-medium">Savings</td><td>$1,000</td><td>$1,000</td><td>$0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="script.js"></script>
+</body>
 </html>
