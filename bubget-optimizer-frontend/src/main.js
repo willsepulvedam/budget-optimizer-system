@@ -1,5 +1,3 @@
-import ApexCharts from 'apexcharts';
-
 document.addEventListener("DOMContentLoaded", function () {
   const timePeriodSelect = document.getElementById("timePeriod");
   const categorySelect = document.getElementById("categoria");
