@@ -1,4 +1,4 @@
-// ============ DATOS SIMULADOS ============
+// simulacion de datos 
 const mockProducts = [
   {
     id: 1,
@@ -72,7 +72,7 @@ let currentProducts = [...mockProducts];
 let selectedProduct = null;
 let currentUser = null;
 
-// ============ INICIALIZACIÓN ============
+// inicializacion 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
   setupEventListeners();
@@ -85,7 +85,7 @@ function initApp() {
   }
 }
 
-// ============ NAVEGACIÓN ============
+// navegacion
 function goToComparador() {
   if (!currentUser) {
     openAuthOverlay();
@@ -123,7 +123,7 @@ function showAppLayout() {
   document.getElementById('user-name-display').textContent = currentUser.name;
 }
 
-// ============ EVENT LISTENERS ============
+// event listener
 function setupEventListeners() {
   document.getElementById('form-login').addEventListener('submit', handleLogin);
   document.getElementById('form-register').addEventListener('submit', handleRegister);
@@ -139,7 +139,7 @@ function setupEventListeners() {
   });
 }
 
-// ============ AUTENTICACIÓN ============
+// autenticacion 
 function openAuthOverlay() {
   document.getElementById('auth-overlay').classList.add('active');
 }
@@ -229,7 +229,7 @@ function handleLogout() {
   }
 }
 
-// ============ COMPARADOR ============
+// comparador 
 function renderProducts() {
   const container = document.getElementById('products-list');
   
@@ -313,7 +313,7 @@ function handleSearch() {
   document.getElementById('comparison-list').innerHTML = '<p style="color: #999; text-align: center; padding: 1.5rem;"><i class="fas fa-inbox"></i> No hay comparación</p>';
 }
 
-// ============ DASHBOARD ============
+//  dashboard
 function loadDashboardData() {
   const expenses = currentUser.expenses || [];
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -372,7 +372,7 @@ function loadExpensesChart() {
   });
 }
 
-// ============ GRÁFICOS ============
+//  grafica
 let trendChart = null;
 let distributionChart = null;
 
@@ -435,22 +435,22 @@ function updateDistributionChart(product) {
   });
 }
 
-// ============ PRESUPUESTOS ============
+// presupuestos
 function openAddBudget() {
   alert(' Funcionalidad para agregar presupuestos');
 }
 
-// ============ TRANSACCIONES ============
+// trnasaacciones
 function openAddTransaction() {
   alert(' Funcionalidad para agregar transacciones');
 }
 
-// ============ REPORTES ============
+// reportes
 function loadReports() {
   // Charts para reportes
 }
 
-// ============ UTILIDADES ============
+// utilidades
 function showError(inputId, message) {
   const input = document.getElementById(inputId);
   const errorDiv = input.nextElementSibling;
