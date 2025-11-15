@@ -1,4 +1,4 @@
-/* === RESET === */
+/* reset*/
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +12,7 @@ body {
   min-height: 100vh;
 }
 
-/* === PAGES === */
+/*paginas*/
 .page-wrapper {
   display: none;
 }
@@ -39,7 +39,7 @@ body {
   display: none !important;
 }
 
-/* === LANDING PAGE === */
+/* pagina de inicio */
 .landing-nav {
   display: flex;
   justify-content: space-between;
@@ -117,7 +117,7 @@ body {
   color: white;
 }
 
-/* === AUTH OVERLAY === */
+/*inicio de sesion */ 
 .auth-overlay {
   position: fixed;
   top: 0;
@@ -235,7 +235,7 @@ body {
   font-weight: 600;
 }
 
-/* === APP LAYOUT === */
+/*app layout*/
 .app-layout {
   display: flex;
   min-height: 100vh;
@@ -245,7 +245,7 @@ body {
   display: none;
 }
 
-/* === SIDEBAR === */
+/* barra lateral */
 .sidebar {
   width: 280px;
   background: linear-gradient(180deg, #021024, #000a14);
@@ -331,7 +331,7 @@ body {
   background: #dc2626;
 }
 
-/* === MAIN CONTENT === */
+/* contenido principal */
 .main-content {
   flex: 1;
   margin-left: 280px;
@@ -351,7 +351,7 @@ body {
   font-size: 2rem;
 }
 
-/* === COMPARADOR === */
+/* comparador */
 .search-container {
   display: flex;
   gap: 10px;
@@ -581,7 +581,7 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* === DASHBOARD === */
+/*dashboard */
 .dashboard-content {
   display: flex;
   flex-direction: column;
@@ -640,7 +640,7 @@ body {
   font-size: 1.1rem;
 }
 
-/* === CONTENT BOX === */
+/* content box*/
 .content-box {
   background: white;
   padding: 2rem;
@@ -718,7 +718,7 @@ tr:hover {
   font-size: 1.1rem;
 }
 
-/* === RESPONSIVE === */
+/* responsive*/
 @media (max-width: 1024px) {
   .comparador-content {
     grid-template-columns: 1fr;
