@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
 import redis
@@ -17,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = FastAPI()
 
 # Configurar Redis con error handling
 try:
@@ -26,9 +27,9 @@ try:
         port=Config.REDIS_PORT,
         password=Config.REDIS_PASSWORD,
         decode_responses=True,
-        socket_connect_timeout=5  # timeout para conexión
+        socket_connect_timeout=5
     )
-    redis_client.ping()  # Verificar conexión
+    redis_client.ping()
     logger.info("Conexión a Redis exitosa")
 except Exception as e:
     logger.error(f"Error conectando a Redis: {e}")
@@ -36,40 +37,41 @@ except Exception as e:
 
 # Configuramos Gemini
 try:
-    genai.configure(api_key=Config.GOOGLE_IA_API_KEY) # type: ignore
-    model = genai.GenerativeModel('gemini-2.5-flash') # type: ignore
+    genai.configure(api_key=Config.GOOGLE_IA_API_KEY)
+    model = genai.GenerativeModel('gemini-2.5-flash')
     logger.info("Gemini configurado correctamente")
 except Exception as e:
     logger.error(f"Error configurando Gemini: {e}")
     model = None
 
 
-@app.route('/analizar', methods=['POST'])
-def analizar():
+# Definir modelo Pydantic para validación
+class AnalisisRequest(BaseModel):
+    nombre: str
+    prompt: str
+
+
+@app.post('/analizar')
+def analizar(request_data: AnalisisRequest):
     try:
-        data = request.get_json()
-        
-        if not data:
-            logger.warning("Petición sin datos JSON")
-            return jsonify({"error": "No se enviaron datos"}), 400
-        
-        nombre = data.get('nombre')
-        prompt = data.get('prompt')
+        nombre = request_data.nombre
+        prompt = request_data.prompt
         
         if not nombre or not prompt:
             logger.warning(f"Datos incompletos - nombre: {nombre}, prompt: {prompt}")
-            return jsonify({"error": "Falta nombre o prompt"}), 400
+            raise HTTPException(
+                status_code=400,
+                detail="Falta nombre o prompt"
+            )
         
         logger.info(f"Analizando presupuesto para: {nombre}")
         
         cache_key = f"analisis:{nombre}:{hash(prompt)}"
         
-        # The line `if redis_client and redis_client.exists(cache_key):` is checking if the
-        # `redis_client` object exists and if the key `cache_key` exists in the Redis database.
         if redis_client and redis_client.exists(cache_key):
             logger.info(f"Usando datos de cache para {nombre}")
             cached_data = redis_client.get(cache_key)
-            return jsonify(json.loads(cached_data)), 200 # type: ignore
+            return json.loads(cached_data)
         
         prompt_final = f"""
 Eres un analista de presupuestos experto. Basándote en la siguiente información del usuario, 
@@ -89,7 +91,10 @@ Retorna SOLO un JSON válido (sin markdown) con esta estructura exacta:
         
         if not model:
             logger.error("Modelo Gemini no disponible")
-            return jsonify({"error": "Servicio de IA no disponible"}), 500
+            raise HTTPException(
+                status_code=500,
+                detail="Servicio de IA no disponible"
+            )
         
         response = model.generate_content(prompt_final)
         
@@ -110,29 +115,40 @@ Retorna SOLO un JSON válido (sin markdown) con esta estructura exacta:
                 logger.warning(f"Error guardando en cache: {e}")
         
         logger.info(f"Análisis completado exitosamente para {nombre}")
-        return jsonify(resultado), 200
+        return resultado
     
     except json.JSONDecodeError as e:
         logger.error(f"Error parseando JSON de Gemini: {e}")
-        return jsonify({"error": "Error procesando respuesta de IA"}), 500
+        raise HTTPException(
+            status_code=500,
+            detail="Error procesando respuesta de IA"
+        )
+    
+    except HTTPException:
+        raise
     
     except Exception as e:
         logger.error(f"Error en analizar: {e}", exc_info=True)
-        return jsonify({"error": "Error interno del servidor"}), 500
+        raise HTTPException(
+            status_code=500,
+            detail="Error interno del servidor"
+        )
 
 
-@app.route('/health', methods=['GET'])
+@app.get('/health')
 def health():
-    return jsonify({
+    return {
         "status": "ok",
         "gemini": "connected" if model else "disconnected",
         "redis": "connected" if redis_client else "disconnected"
-    }), 200
+    }
 
 
 if __name__ == '__main__':
-    app.run(
+    import uvicorn
+    uvicorn.run(
+        app,
         host=Config.ML_SERVICE_HOST,
         port=Config.ML_SERVICE_PORT,
-        debug=False  # NUNCA en producción
+        reload=False
     )
