@@ -27,5 +27,6 @@ load_env()
 
 class GeminiConfig:
     def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY", "")
-        self.model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-flash")
+        # Support both GEMINI_* and GOOGLE_AI_* env var names
+        self.api_key = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_AI_API_KEY", ""))
+        self.model_name = os.getenv("GEMINI_MODEL_NAME", os.getenv("GOOGLE_AI_MODEL_NAME", "gemini-1.5-flash"))
