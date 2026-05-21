@@ -1,18 +1,28 @@
 package com.budgetoptimizer.budget_optimizer_backend.service;
 
-import com.budgetoptimizer.budget_optimizer_backend.dto.expense.ExpenseDTO;
-import com.budgetoptimizer.budget_optimizer_backend.dto.expense.ExpenseResponseDTO;
-import com.budgetoptimizer.budget_optimizer_backend.enums.PaymentMethod;
-import com.budgetoptimizer.budget_optimizer_backend.model.*;
-import com.budgetoptimizer.budget_optimizer_backend.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.budgetoptimizer.budget_optimizer_backend.dto.expense.ExpenseDTO;
+import com.budgetoptimizer.budget_optimizer_backend.dto.expense.ExpenseResponseDTO;
+import com.budgetoptimizer.budget_optimizer_backend.enums.PaymentMethod;
+import com.budgetoptimizer.budget_optimizer_backend.model.Categoria;
+import com.budgetoptimizer.budget_optimizer_backend.model.Empresa;
+import com.budgetoptimizer.budget_optimizer_backend.model.Expense;
+import com.budgetoptimizer.budget_optimizer_backend.model.Presupuesto;
+import com.budgetoptimizer.budget_optimizer_backend.model.Usuario;
+import com.budgetoptimizer.budget_optimizer_backend.repository.CategoriaRepository;
+import com.budgetoptimizer.budget_optimizer_backend.repository.EmpresaRepository;
+import com.budgetoptimizer.budget_optimizer_backend.repository.ExpenseRepository;
+import com.budgetoptimizer.budget_optimizer_backend.repository.PresupuestoRepository;
+import com.budgetoptimizer.budget_optimizer_backend.repository.UsuarioRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +55,9 @@ public class ExpenseService {
         if (!presupuesto.getUsuario().getId().equals(usuario.getId())) {
             throw new IllegalArgumentException("El presupuesto no pertenece al usuario");
         }
+
+
+        
 
         // 4. Validar que el presupuesto permite registrar gastos
         if (!presupuesto.getStatus().getPuedeRegistrarGastos()) {
